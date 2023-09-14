@@ -1,0 +1,61 @@
+.imageProfile{
+    border: 2px solid black;
+    border-radius: 100%;
+}
+
+.abrirUpload{
+    z-index: 4;
+    margin: 2em;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.formularioProfile{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.conatinerPopup{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    background-color: orange;
+    z-index: 4;
+    position: absolute;
+    border: 1px solid black;
+}
+/* Estilo padrão para a imagem de perfil */
+.profile-image {
+    max-width: 100px; /* Defina o tamanho desejado */
+    height: auto; /* Defina o tamanho desejado */
+    border-radius: 100%; /* Para criar uma imagem de perfil circular */
+  }
+  .container-fluid{
+    background-color: orange;
+    margin: 0;
+    border: 2px solid black;
+}
+.profile-img{
+    max-width: 70px;
+    height: auto;
+    border-radius: 100%;
+}
+#navbar-user{
+    position: static;
+}
+.usersList{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.usersList li{
+    padding: 1em;
+    background-color: rgb(255, 166, 0);
+    width: 100vh;
+    border-bottom: 1px solid black;
+}

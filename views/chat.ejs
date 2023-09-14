@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<!-- chat.ejs -->
+<h1>Chat com <%= otherUser.username %></h1>
+<div id="chat-box">
+  <!-- Aqui serão exibidas as mensagens -->
+</div>
+<form id="message-form">
+  <input type="text" id="message-input" placeholder="Digite sua mensagem">
+  <button type="submit">Enviar</button>
+</form>
+
+<!-- Adicione isso ao seu arquivo HTML -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+      document.addEventListener('DOMContentLoaded', function() {
+
+  const socket = io();
+
+  // Lógica para enviar mensagens
+  document.getElementById('message-form').addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevenir o envio padrão do formulário
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value;
+    socket.emit('sendMessage', { text: message });
+
+    // Limpar o campo de entrada após o envio
+    messageInput.value = '';
+  });
+
+  // Lógica para lidar com mensagens recebidas
+  socket.on('sendMessage', (data) => { // Mude de 'message' para 'sendMessage'
+    const chatBox = document.getElementById('chat-box');
+    const messageItem = document.createElement('p');
+    messageItem.textContent = data.text;
+    chatBox.appendChild(messageItem);
+  });
+}
+
+</script>    
+</body>
+</html>

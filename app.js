@@ -5,26 +5,90 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const handlebars = require('express-handlebars'); // Importe 'express-handlebars' corretamente
 const path = require('path'); // Importe o módulo path
+const multer = require('multer'); // Para lidar com uploads de arquivos
 const app = express();
+const http = require('http');
+const socketIo = require('socket.io');
 const PORT = 3000;
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
+app.use('/socket.io', express.static(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist')));
+
+// Lógica de conexão WebSocket
+io.on('connection', (socket) => {
+  console.log('Um usuário se conectou');
+
+  // Lógica para lidar com mensagens recebidas
+  socket.on('sendMessage', (data) => {
+    console.log('Mensagem recebida:', data);
+
+    // Emita a mensagem para todos os clientes conectados, incluindo o remetente
+    io.emit('message', data);
+  });
+
+  // Lógica de desconexão
+  socket.on('disconnect', () => {
+    console.log('Um usuário se desconectou');
+  });
+});
+
+
+const messageSchema = new mongoose.Schema({
+  senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  content: String,
+  timestamp: { type: Date, default: Date.now },
+});
+
+const Message = mongoose.model('Message', messageSchema);
+
+module.exports = Message;
+
+// Definir o esquema do usuário
+const userSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+  profileImage: String // Novo campo para armazenar o caminho da imagem
+});
+
+const User = mongoose.model('User', userSchema);
+module.exports = User; // Exporte o modelo User
 
 // Configurar o express-session
 app.use(session({
   secret: 'EndyAlves24',
   resave: false,
   saveUninitialized: true
-}));
+  }));
 
-app.use(express.static('public'));
+  app.use(express.static('public'));
 
 
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 
+// Importe as rotas
+const indexRouter = require('./Routes/rotas');
+// Use as rotas
+app.use('/', indexRouter);
 
-  app.set('view engine', 'ejs');
-  app.set('views', path.join(__dirname, 'views'));
-  app.use(express.static(path.join(__dirname, 'public')));
+// Configurar o express-session
+app.use(session({
+secret: 'EndyAlves24',
+resave: false,
+saveUninitialized: true
+}));
+
+
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexão com o MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/Vags_database', {
@@ -34,72 +98,11 @@ mongoose.connect('mongodb://127.0.0.1:27017/Vags_database', {
   .then(() => console.log('Conexão com o MongoDB estabelecida'))
   .catch((err) => console.error('Erro ao conectar com o MongoDB:', err));
 
-// Definir o esquema do usuário
-const userSchema = new mongoose.Schema({
-  username: String,
-  password: String,
-});
 
-const User = mongoose.model('User', userSchema);
+  server.listen(4000, () => {
+    console.log('Servidor WebSocket está ouvindo na porta 4000');
+  });
 
-// Rota para a página de registro de usuário
-app.get('/register', (req, res) => {
-  res.render('register');
-});
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const newUser = new User({ username, password });
-  try {
-    await newUser.save();
-    res.redirect('/login');
-  } catch (error) {
-    res.send('Erro ao registrar o usuário.');
-  }
-});
-
-// Rota para lidar com o registro de usuário
-app.post('/register', (req, res) => {
-  const { username, password } = req.body;
-  users.push({ username, password });
-  res.redirect('/login');
-});
-
-// Rota para a página de login
-app.get('/login', (req, res) => {
-  res.render(`login`);
-});
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const user = await User.findOne({ username, password });
-    if (user) {
-      // Armazene o nome de usuário na sessão
-      req.session.username = username;
-      res.redirect(`/landing`);
-    } else {
-      res.send('Credenciais inválidas. Por favor, tente novamente.');
-    }
-  } catch (error) {
-    res.send('Erro ao fazer login.');
-  }
-});
-
-// Rota para lidar com a autenticação de login
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(user => user.username === username && user.password === password);
-  res.redirect('landing')
-});
-
-app.get('/landing', (req, res) => {
-  // Acesse o nome de usuário armazenado na sessão
-  const username = req.session.username || "User";
-
-  res.render('landingPage', {user: {username}});
-})
-
-
-//porta em que o site vai rodar
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

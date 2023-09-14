@@ -5,12 +5,13 @@
 </head>
 <body>
   <div class="container">
-    <form class="form" method="post" action="/register">
-      <h1>Registro de Usuário</h1>
-      <input type="text" name="username" placeholder="Nome de Usuário" required>
-      <input type="password" name="password" placeholder="Senha" required>
-      <button type="submit">Registrar</button>
-    </form>
+  <form class="form" action="/register" method="POST" enctype="multipart/form-data">
+    <input type="text" name="username" placeholder="Nome de Usuário" required>
+    <input type="password" name="password" placeholder="Senha" required>
+    <input class="inputDeImg" type="file" name="profileImage" accept="image/*"> <!-- Campo de upload de imagem -->
+    <button type="submit">Registrar</button>
+  </form>
+  </div>
   </div>
 </body>
 </html>

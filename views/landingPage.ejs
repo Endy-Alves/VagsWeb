@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="/css/landing.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,15 +9,28 @@
     <title>Landing-Page</title>
 </head>
 <body>
-    <nav class="navbar bg-body-tertiary fixed-top">
+    <nav id="navbar-user" class="navbar bg-body-tertiary fixed-top">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">Vags.Web</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <span><img class="profile-img" src="/uploads/<%= profileImage %>" alt=""></span>
           </button>
           <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
             <div class="offcanvas-header">
               <h5 class="offcanvas-title" id="offcanvasNavbarLabel"><%= user.username %></h5>
+              <div class="abrirUpload" id="openUpload" style="cursor: pointer;">
+                <!-- Aqui você pode inserir uma imagem ou ícone para indicar o upload --> 
+                <img id="uploadedImage" src="/uploads/<%= profileImage %>" alt="Imagem de Perfil" class="profile-image">
+                <!--<img id="uploadedImage" src="" alt="Uploaded Image">-->
+                Clique para fazer upload de imagem
+              </div>
+              <div class="conatinerPopup" id="uploadContainer" style="display: none;">
+                <form class="formularioProfile" action="/upload" method="POST" enctype="multipart/form-data">
+                  <input type="file" name="profileImage">
+                  <button type="submit">Enviar Imagem</button>
+                </form>
+              </div>
+              
               <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
@@ -49,6 +63,38 @@
           </div>
         </div>
       </nav>
+
+      <div class="usersList">
+        <h1>Usuários Cadastrados</h1>
+      <ul>
+        <% users.forEach(function(user) { %>
+          <li>
+            <%= user.username %>
+            <a href="/chat/<%= user._id %>">Iniciar Conversa</a>
+          </li>
+        <% }); %>
+      </ul>      
+      </div>
+      
+
+
+
+      <script>
+        const openUpload = document.getElementById('openUpload');
+        const uploadContainer = document.getElementById('uploadContainer');
+        const uploadedImage = document.getElementById('uploadedImage'); // Novo elemento de imagem
+      
+        openUpload.addEventListener('click', () => {
+          uploadContainer.style.display = 'block';
+        });
+      
+        document.addEventListener('click', (event) => {
+          if (!uploadContainer.contains(event.target) && event.target !== openUpload) {
+            uploadContainer.style.display = 'none';
+          }
+        });
+      </script>
+         
     
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
