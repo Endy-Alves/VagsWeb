@@ -10,11 +10,12 @@ const app = express();
 const http = require('http');
 const socketIo = require('socket.io');
 const PORT = 3000;
-
 const server = http.createServer(app);
 const io = socketIo(server);
 
 app.use('/socket.io', express.static(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist')));
+
+let socket = []
 
 // Lógica de conexão WebSocket
 io.on('connection', (socket) => {
@@ -51,10 +52,12 @@ const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   profileImage: String // Novo campo para armazenar o caminho da imagem
-});
+}, {strict:false});
 
 const User = mongoose.model('User', userSchema);
 module.exports = User; // Exporte o modelo User
+
+console.log(User.username)
 
 // Configurar o express-session
 app.use(session({
@@ -91,7 +94,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexão com o MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/Vags_database', {
+mongoose.connect('mongodb+srv://alvesandy32:CRzCO8Cs8LoI8fXM@clustervagsweb.6s0ekwj.mongodb.net/?retryWrites=true&w=majority&appName=ClusterVagsWeb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })

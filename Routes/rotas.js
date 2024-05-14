@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const User = require('../app'); // Importe o modelo User
 const upload = multer({ dest: 'public/uploads/' }); // Define o diretório onde as imagens serão armazenadas
 const Message = require('../app');
+const jwt = require('jsonwebtoken')
 
 
 // Endpoint para enviar uma mensagem
@@ -110,6 +111,10 @@ router.get('/register', (req, res) => {
   router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
+      const secret = process.env.SECRET
+        const token = jwt.sign({id:User._id}, secret, {
+            expiresIn:  '6h'
+        })
       const user = await User.findOne({ username, password });
       if (user) {
         // Armazene o nome de usuário na sessão
@@ -129,12 +134,13 @@ router.get('/register', (req, res) => {
   router.post('/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(user => user.username === username && user.password === password);
-    res.redirect('landing')
+    res.redirect('/landing')
   });
 
 
 // Rota da página principal
 router.get('/landing', async (req, res) => {
+  const username = req.params.username
   try {
     // Busque a lista de usuários no banco de dados
     const users = await User.find({}, 'username profileImage'); // Inclua 'profileImage' para buscar a imagem de perfil dos usuários
